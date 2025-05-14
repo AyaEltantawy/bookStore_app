@@ -1,16 +1,14 @@
 import 'package:bookstore_app/core/services/dio_helper.dart';
 import 'package:bookstore_app/features/onboarding/splash_screen.dart';
-import 'package:bookstore_app/features/order/cart_screen.dart';
 import 'package:bookstore_app/features/profile/change_passowrd_screen.dart';
-import 'package:bookstore_app/features/profile/edit_profile_screen.dart';
+import 'package:bookstore_app/features/profile/view/presentation/edit_profile_screen.dart';
 import 'package:bookstore_app/features/profile/help_screen.dart';
-import 'package:bookstore_app/features/profile/profile_screen.dart';
+import 'package:bookstore_app/features/profile/view/presentation/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
- 
   DioHelper.init();
   runApp(BookStore_App());
 }
@@ -26,8 +24,8 @@ class BookStore_App extends StatelessWidget {
       themeMode: ThemeMode.light,
       theme: ThemeData(fontFamily: GoogleFonts.openSans().fontFamily),
       debugShowCheckedModeBanner: false,
-      home: ProfilePage(),
-      // home: SplashScreen(),
+      // home: ProfilePage(),
+      home: SplashScreen(),
     );
   }
 }

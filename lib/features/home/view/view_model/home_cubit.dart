@@ -7,24 +7,22 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeCubit extends Cubit<HomeStates> {
   HomeCubit() : super(HomeInitState());
-   
-      HomeCubit get(context) => BlocProvider.of(context);
 
-List<Books>? books;
+  HomeCubit get(context) => BlocProvider.of(context);
 
-  getlimitBooks(){
+  List<Books>? books;
+
+  getlimitBooks() {
     emit(GetLimitBooksLoadingState());
-    DioHelper.getData(url: "/books", query: {
-      'limit' : 2
-    }).then((value){
+    DioHelper.getData(url: "/books", query: {'limit': 2}).then((value) {
       books = List<Books>.from(
-  value.data['data']['books'].map((book) => Books.fromJson(book)),
-);
+        value.data['data']['books'].map((book) => Books.fromJson(book)),
+      );
       emit(GetLimitBooksSucessState(books: books!));
-    }).onError((error, stackTrace) {
-      emit(GetLimitBooksErrorState());
-    },);
+    }).onError(
+      (error, stackTrace) {
+        emit(GetLimitBooksErrorState());
+      },
+    );
   }
-
-
 }

@@ -26,16 +26,12 @@ class DioHelper {
   }
 
   static Future<Response> getData(
-      {required String url,
-      String? token,
-      required Map<String, dynamic>? query}) async {
-    // if (token != null) {
-    //   dio!.options.headers = {
-    //     'Accept': 'application/json',
-    //     'Content-Type': 'application/json',
-    //     'authorization': 'Bearer $token',
-    //   };
-    // }
+      {required String url, String? token, Map<String, dynamic>? query}) async {
+    if (token != null) {
+      dio!.options.headers.addAll({
+        'Authorization': 'Bearer $token',
+      });
+    }
 
     return await dio!.get(
       url,
@@ -49,6 +45,11 @@ class DioHelper {
       {required String url,
       required Map<String, dynamic>? data,
       String? token}) async {
+    if (token != null) {
+      dio!.options.headers.addAll({
+        'Authorization': 'Bearer $token',
+      });
+    }
     // if (token != null) {
     //   dio!.options.headers = {
     //     'Accept': 'application/json',
