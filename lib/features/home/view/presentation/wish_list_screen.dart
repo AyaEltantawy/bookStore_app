@@ -1,246 +1,94 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bookstore_app/features/home/data/models/book_model.dart';
+import 'package:bookstore_app/features/home/view/view_model/cubit/wish_list_cubit.dart';
+import 'package:bookstore_app/features/home/view/view_model/cubit/wish_list_state.dart';
 
 class WishListScreen extends StatelessWidget {
   const WishListScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        title: Text('Wishlist'),
+    return BlocProvider(
+      create: (_) => WishListCubit()..fetchWishlist(),
+      child: Scaffold(
+        backgroundColor: Colors.grey[200],
+        appBar: AppBar(
+          title: const Text('Wishlist'),
+          centerTitle: true,
+        ),
+        body: WishListBody(),
       ),
-      body: Column(
+    );
+  }
+}
+
+class WishListBody extends StatelessWidget {
+  const WishListBody({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<WishListCubit, WishListState>(
+      builder: (context, state) {
+        if (state is WishListLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is WishListSuccess) {
+          if (state.books.isEmpty) {
+            return const Center(child: Text('Wishlist is empty'));
+          }
+          return ListView.separated(
+            padding: const EdgeInsets.all(12),
+            itemCount: state.books.length,
+            itemBuilder: (context, index) {
+              return WishListItem(book: state.books[index]);
+            },
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
+          );
+        } else if (state is WishListError) {
+          return Center(child: Text(state.message));
+        }
+        return const SizedBox();
+      },
+    );
+  }
+}
+
+class WishListItem extends StatelessWidget {
+  final Books book;
+
+  const WishListItem({super.key, required this.book});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.white,
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
         children: [
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Image.asset(
-                      'assets/image/ph1.png',
-                      width: 98,
-                      height: 124,
-                      fit: BoxFit.cover,
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Rich Dad And Poor Dad',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                        const SizedBox(height: 7),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Author: ',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'Robert T. Kiyosaki',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 15),
-                        Text(
-                          'Item out of stock',
-                          style: TextStyle(
-                            color: Color(0xFFEB4335),
-                          ),
-                        ),
-                        SizedBox(height: 15),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'ASIN : ',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'B09TWSRMCB',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {},
-                          ),
-                          Text('Remove')
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 20),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.favorite),
-                            onPressed: () {},
-                          ),
-                          Text('Move to cart')
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+          Image.network(
+            book.image ?? '',
+            width: 98,
+            height: 124,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
           ),
-          SizedBox(height: 20),
-          Container(
-            color: Colors.white,
-            padding: const EdgeInsets.all(8.0),
+          const SizedBox(width: 10),
+          Expanded(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    Image.asset(
-                      'assets/image/ph1.png',
-                      width: 98,
-                      height: 124,
-                      fit: BoxFit.cover,
-                    ),
-                    const SizedBox(width: 10),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Rich Dad And Poor Dad',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                        const SizedBox(height: 7),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'Author: ',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'Robert T. Kiyosaki',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 15),
-                        Text(
-                          'Item out of stock',
-                          style: TextStyle(
-                            color: Color(0xFFEB4335),
-                          ),
-                        ),
-                        SizedBox(height: 15),
-                        RichText(
-                          text: TextSpan(
-                            children: [
-                              TextSpan(
-                                text: 'ASIN : ',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'B09TWSRMCB',
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                Text(
+                  book.title ?? '',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                SizedBox(height: 10),
-                Row(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.delete),
-                            onPressed: () {},
-                          ),
-                          Text('Remove')
-                        ],
-                      ),
-                    ),
-                    SizedBox(width: 20),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.favorite),
-                            onPressed: () {},
-                          ),
-                          Text('Move to cart')
-                        ],
-                      ),
-                    ),
-                  ],
+                const SizedBox(height: 7),
+                Text('Author: ${book.author ?? ''}'),
+                const SizedBox(height: 15),
+                const Text(
+                  'Item out of stock',
+                  style: TextStyle(color: Color(0xFFEB4335)),
                 ),
               ],
             ),

@@ -11,10 +11,13 @@ class CartModel {
 
   factory CartModel.fromJson(Map<String, dynamic> json) {
     return CartModel(
-      cartId: json['cart_id'],
-      total: json['total'],
+      cartId: json['cart_id'] is int
+          ? json['cart_id']
+          : int.tryParse(json['cart_id'].toString()) ?? 0,
+      total: json['total'].toString(),
       cartBooks: List<CartBook>.from(
-        json['cart_books'].map((book) => CartBook.fromJson(book)),
+        (json['cart_books'] as List<dynamic>)
+            .map((book) => CartBook.fromJson(book)),
       ),
     );
   }
@@ -25,8 +28,8 @@ class CartBook {
   final String title;
   final String image;
   final String price;
-  final String discount;
-  final String priceAfterDiscount;
+  final String? discount;
+  final int priceAfterDiscount;
   final int quantity;
   final String subAmount;
 
@@ -43,14 +46,20 @@ class CartBook {
 
   factory CartBook.fromJson(Map<String, dynamic> json) {
     return CartBook(
-      id: json['book_id'],
-      title: json['book_title'],
-      image: json['book_image'],
-      price: json['book_price'],
-      discount: json['book_discount'],
-      priceAfterDiscount: json['book_price_after_discount'],
-      quantity: json['book_quantity'],
-      subAmount: json['book_sub_amount'],
+      id: json['book_id'] is int
+          ? json['book_id']
+          : int.tryParse(json['book_id'].toString()) ?? 0,
+      title: json['book_title'].toString(),
+      image: json['book_image'].toString(),
+      price: json['book_price'].toString(),
+      discount: json['book_discount']?.toString(),
+      priceAfterDiscount: json['book_price_after_discount'] is int
+          ? json['book_price_after_discount']
+          : int.tryParse(json['book_price_after_discount'].toString()) ?? 0,
+      quantity: json['book_quantity'] is int
+          ? json['book_quantity']
+          : int.tryParse(json['book_quantity'].toString()) ?? 1,
+      subAmount: json['book_sub_amount'].toString(),
     );
   }
 }

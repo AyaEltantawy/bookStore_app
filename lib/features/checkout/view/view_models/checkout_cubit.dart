@@ -1,12 +1,16 @@
-import 'package:bookstore_app/core/services/dio_helper.dart';
+import 'package:bookstore_app/core/magic_router/magic_router.dart';
+import 'package:bookstore_app/core/utils/snack_bar.dart';
+import 'package:bookstore_app/features/cart/data/model/cart_model.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../../../core/services/dio_helper.dart';
 import 'checkout_state.dart';
 
 class CheckoutCubit extends Cubit<CheckoutState> {
   CheckoutCubit() : super(CheckoutInitialState());
 
-  static CheckoutCubit get(context) => BlocProvider.of(context);
+  CartModel? checkout;
 
   Future<void> getCheckout() async {
     emit(CheckoutLoadingState());
@@ -15,46 +19,70 @@ class CheckoutCubit extends Cubit<CheckoutState> {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
+      print("object: $token");
       final response = await DioHelper.getData(
         url: '/checkout',
-        token: token ?? '',
+        token: token,
         query: {},
       );
 
-      if (response.statusCode == 200) {
-        final checkoutData = response.data['data']['data'];
+      print("Checkout response: ${response.data['data']['data']}");
 
-        print('checccccccccccccccccccout');
-        print(checkoutData);
-        emit(CheckoutLoadedState(checkoutData!));
-      } else {
-        emit(CheckoutErrorState('Failed to load checkout data'));
-      }
-    } catch (e) {
-      emit(CheckoutErrorState('Error: $e'));
+      checkout = CartModel.fromJson(response.data['data']['data']);
+      print("Checkout: ${response.data['data']['data']}");
+
+      emit(CheckoutLoadedState(checkout!));
+    } catch (error) {
+      print("Checkout error: $error");
+      emit(CheckoutErrorState(error.toString()));
     }
   }
 
-  Future<void> placeOrder() async {
-    emit(CheckoutLoadingState());
-
+  void placeOrder(BuildContext context) async {
     try {
+      emit(CheckoutLoadingState());
+
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
 
       final response = await DioHelper.postData(
         url: '/place-order',
         data: {},
-        token: token ?? '',
+        token: token,
       );
 
-      if (response.statusCode == 200) {
-        emit(CheckoutSuccessState('Order placed successfully'));
+      final data = response?.data;
+      if (data != null && data['status'] == true) {
+        Utils.showSnackBar(context, data['message']);
+        emit(CheckoutSuccessState(data['message']));
       } else {
-        emit(CheckoutErrorState('Failed to place order'));
+        emit(CheckoutErrorState(data?['message'] ?? 'Order failed'));
       }
+
+      await getCheckout(); // Optionally refresh the cart
     } catch (e) {
-      emit(CheckoutErrorState('Error: $e'));
+      emit(CheckoutErrorState('Exception: $e'));
+    }
+  }
+
+
+
+  Future<void> updateQuantity(int bookId, int qty) async {
+    try {
+      emit(CheckoutLoadingState());
+
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      await DioHelper.postData(
+        url: '/update-cart',
+        data: {'book_id': bookId, 'quantity': qty},
+        token: token,
+      );
+
+      await getCheckout(); // Refresh cart
+    } catch (e) {
+      emit(CheckoutErrorState('Exception: $e'));
     }
   }
 }

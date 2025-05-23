@@ -17,7 +17,9 @@ class ProfileSuccessState extends ProfileState {
   @override
   Map<String, dynamic>? get user => userData;
 }
-
+class UpdateProfileLoading extends ProfileState{}
+class UpdateProfileSuccess extends ProfileState{}
+class UpdateProfileFailed extends ProfileState{}
 class ProfileErrorState extends ProfileState {
   final Map<String, List<String>> error;
   ProfileErrorState({required this.error});

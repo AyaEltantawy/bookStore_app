@@ -10,7 +10,11 @@ class OrderHistoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => OrderHistoryCubit(),
+      create: (_) {
+        final cubit = OrderHistoryCubit();
+        cubit.getOrderHistory(cubit.state.selectedFilter.toLowerCase());
+        return cubit;
+      },
       child: const _OrderHistoryView(),
     );
   }
@@ -26,13 +30,16 @@ class _OrderHistoryView extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title:
-            const Text("Order history", style: TextStyle(color: Colors.black)),
+        title: const Text(
+          "Order History",
+          style: TextStyle(color: Colors.black),
+        ),
         backgroundColor: Colors.white,
         elevation: 0,
         leading: const BackButton(color: Colors.black),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -50,10 +57,32 @@ class _OrderHistoryView extends StatelessWidget {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: state.filteredOrders.length,
-              itemBuilder: (context, index) {
-                return OrderCard(order: state.filteredOrders[index]);
+            child: Builder(
+              builder: (context) {
+                if (state.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (state.error != null) {
+                  return Center(
+                    child: Text(
+                      state.error!,
+                      style: const TextStyle(color: Colors.red),
+                    ),
+                  );
+                } else if (state.orders.isEmpty) {
+                  return const Center(child: Text("No orders found."));
+                } else {
+                  print("orddddddddders${state.orders.length}");
+                  return ListView.builder(
+                    itemCount: state.orders.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    itemBuilder: (context, index) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12.0),
+                        child: OrderCard(order: state.orders[index]),
+                      );
+                    },
+                  );
+                }
               },
             ),
           ),

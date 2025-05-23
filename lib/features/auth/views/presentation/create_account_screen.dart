@@ -102,11 +102,12 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 _agreeToTerms) {
                               // نداء الـ SignUp
                               context.read<AuthCubit>().signUp(
-                                    name: _nameController.text,
-                                    email: _emailController.text,
-                                    password: _passwordController.text,
-                                    password_confirmation:
-                                        _confirmPasswordController.text,
+                                    name: _nameController.text.toString(),
+                                    email: _emailController.text.toString(),
+                                password_confirmation:
+                                _confirmPasswordController.text.toString(),
+                                    password: _passwordController.text.toString(),
+
                                   );
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(

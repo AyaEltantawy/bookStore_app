@@ -1,31 +1,29 @@
-import 'package:equatable/equatable.dart';
+import '../../data/models/order.dart' as ui_order;
 
-import '../../data/models/order.dart';
-
-class OrderHistoryState extends Equatable {
+class OrderState {
   final String selectedFilter;
-  final List<Order> orders;
+  final List<ui_order.Order> orders;
+  final bool isLoading;
+  final String? error;
 
-  const OrderHistoryState({
-    required this.selectedFilter,
-    required this.orders,
+  const OrderState({
+    this.selectedFilter = "Pending",
+    this.orders = const [],
+    this.isLoading = false,
+    this.error,
   });
 
-  List<Order> get filteredOrders {
-    if (selectedFilter == 'All') return orders;
-    return orders.where((order) => order.status == selectedFilter).toList();
-  }
-
-  OrderHistoryState copyWith({
+  OrderState copyWith({
     String? selectedFilter,
-    List<Order>? orders,
+    List<ui_order.Order>? orders,
+    bool? isLoading,
+    String? error,
   }) {
-    return OrderHistoryState(
+    return OrderState(
       selectedFilter: selectedFilter ?? this.selectedFilter,
       orders: orders ?? this.orders,
+      isLoading: isLoading ?? this.isLoading,
+      error: error,
     );
   }
-
-  @override
-  List<Object?> get props => [selectedFilter, orders];
 }

@@ -1,13 +1,16 @@
+import '../../view/view_model/order_history_model.dart';
+
 class Order {
-  final String number;
+  final String totalAmount;
   final String status;
   final String date;
-  final String address;
+  final String paymentMethod;
 
   Order({
-    required this.number,
+    required this.totalAmount,
     required this.status,
     required this.date,
-    required this.address,
+    required this.paymentMethod,
   });
 }
+

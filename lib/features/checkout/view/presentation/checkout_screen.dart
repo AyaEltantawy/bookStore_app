@@ -1,10 +1,14 @@
-import 'package:bookstore_app/features/cart/view/widget/cart_summary_widget.dart';
-import 'package:bookstore_app/features/checkout/view/widget/cart_item_widget.dart';
-import 'package:bookstore_app/features/checkout/view/widget/payment_option_widget.dart';
-import 'package:bookstore_app/features/checkout/view/view_models/checkout_cubit.dart';
-import 'package:bookstore_app/features/checkout/view/view_models/checkout_state.dart';
+import 'package:bookstore_app/core/magic_router/magic_router.dart';
+
+import 'package:bookstore_app/features/checkout/view/widget/checkout_cart_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'package:bookstore_app/features/checkout/view/view_models/checkout_cubit.dart';
+import 'package:bookstore_app/features/checkout/view/view_models/checkout_state.dart';
+import 'package:bookstore_app/features/cart/view/widget/cart_summary_widget.dart';
+import 'package:bookstore_app/features/checkout/view/widget/payment_option_widget.dart';
+
 
 class CheckoutScreen extends StatelessWidget {
   const CheckoutScreen({super.key});
@@ -20,7 +24,7 @@ class CheckoutScreen extends StatelessWidget {
         listener: (context, state) {
           if (state is CheckoutSuccessState) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Order placed successfully')),
+              SnackBar(content: Text(state.message)),
             );
           } else if (state is CheckoutErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -32,32 +36,37 @@ class CheckoutScreen extends StatelessWidget {
           if (state is CheckoutLoadingState) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is CheckoutLoadedState) {
-            var cart = state.cart;
+            final cart = state.cart;
+
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  for (var book in cart.cartBooks)
-                    CartItemWidget(
-                      imageUrl: book.bookImage,
-                      title: book.bookTitle,
-                      author: 'Unknown',
-                      asin: book.bookId.toString(),
-                      price: double.parse(book.bookPriceAfterDiscount),
-                      quantity: book.bookQuantity,
-                      onRemove: () {},
-                      onMoveToWishlist: () {},
-                      onIncrease: () {},
-                      onDecrease: () {},
+
+                  // Expanded(
+                  //   child: ListView.separated(
+                  //     itemCount: cart.cartBooks.length,
+                  //     separatorBuilder: (_, __) => const Divider(),
+                  //     itemBuilder: (context, index) =>
+                  //         CartItemWidget(book: cart.cartBooks[index]),
+                  //   ),
+                  // ),
+                  SizedBox(
+                    height: 300, // Or dynamically based on screen height
+                    child: ListView.separated(
+                      itemCount: cart.cartBooks.length,
+                      separatorBuilder: (_, __) => const Divider(),
+                      itemBuilder: (context, index) =>
+                          CheckoutCartItemWidget(book: cart.cartBooks[index]),
                     ),
+                  ),
                   const SizedBox(height: 16),
                   CartSummaryWidget(total: cart.total),
                   const SizedBox(height: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Payment Method",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      const Text("Payment Method", style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
                       PaymentOption(title: "Online payment"),
                       PaymentOption(title: "Cash on delivery", selected: true),
@@ -70,7 +79,8 @@ class CheckoutScreen extends StatelessWidget {
                     decoration: InputDecoration(
                       hintText: "Add note",
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8)),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -83,16 +93,19 @@ class CheckoutScreen extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       onPressed: () {
-                        context.read<CheckoutCubit>().placeOrder();
+                        context.read<CheckoutCubit>().placeOrder(context);
+
                       },
                       child: const Text("Confirm order"),
                     ),
-                  )
+                  ),
                 ],
               ),
             );
           }
-          return const SizedBox.shrink();
+
+          // في حالة مفيش حاجة من الحالات التانية
+          return const Center(child: Text('No data available'));
         },
       ),
     );

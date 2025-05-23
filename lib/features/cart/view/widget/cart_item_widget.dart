@@ -18,31 +18,51 @@ class CartItemWidget extends StatelessWidget {
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            Image.network(
-              book.image,
-              width: 80,
-              height: 100,
-              fit: BoxFit.cover,
-            ),
+            // Uncomment when image is available
+            // Image.network(
+            //   book.image,
+            //   width: 80,
+            //   height: 80,
+            //   fit: BoxFit.cover,
+            // ),
             const SizedBox(width: 12),
+
+            /// Expanded content area
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(book.title,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 16)),
+                  /// Prevent long titles from overflowing
+                  Text(
+                    book.title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text('${book.priceAfterDiscount} EGP',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w500)),
-                  Text('Quantity: ${book.quantity}',
-                      style: const TextStyle(fontSize: 12)),
+                  Text(
+                    '${book.priceAfterDiscount} EGP',
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  Text(
+                    'Quantity: ${book.quantity}',
+                    style: const TextStyle(fontSize: 12),
+                  ),
                 ],
               ),
             ),
+
+            const SizedBox(width: 12),
+
+            /// Quantity controls
             Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
+                // here I will put inkell to put delete cart func
                 IconButton(
                   icon: const Icon(Icons.remove),
                   onPressed: () {
@@ -52,6 +72,7 @@ class CartItemWidget extends StatelessWidget {
                   },
                 ),
                 Text(book.quantity.toString()),
+                // here I will put inkell to add cart func
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () {
@@ -59,7 +80,7 @@ class CartItemWidget extends StatelessWidget {
                   },
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

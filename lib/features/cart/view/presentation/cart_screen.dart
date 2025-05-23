@@ -1,20 +1,30 @@
-import 'package:bookstore_app/features/cart/view/widget/cart_checkout_button.dart';
-import 'package:bookstore_app/features/cart/view/widget/cart_summary_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../view_model/cart_cubit.dart';
 import '../view_model/cart_state.dart';
+import '../widget/cart_checkout_button.dart';
 import '../widget/cart_item_widget.dart';
+import '../widget/cart_summary_widget.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<CartCubit>().getCart();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My cart'),
-        leading: const BackButton(),
+        title: const Text('My Cart'),
       ),
       body: BlocBuilder<CartCubit, CartState>(
         builder: (context, state) {
@@ -28,12 +38,13 @@ class CartScreen extends StatelessWidget {
                   child: ListView.separated(
                     itemCount: cart.cartBooks.length,
                     separatorBuilder: (_, __) => const Divider(),
-                    itemBuilder: (context, index) => CartItemWidget(
-                      book: cart.cartBooks[index],
-                    ),
+                    itemBuilder: (context, index) =>
+                        CartItemWidget(book: cart.cartBooks[index]),
                   ),
                 ),
-                CartSummaryWidget(total: cart.total),
+                // CartSummaryWidget(total: cart.total),
+
+                CartCheckoutButton()
               ],
             );
           } else if (state is CartErrorState) {
@@ -43,7 +54,6 @@ class CartScreen extends StatelessWidget {
           }
         },
       ),
-      bottomNavigationBar: const CartCheckoutButton(),
     );
   }
 }

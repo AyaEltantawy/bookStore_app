@@ -6,11 +6,25 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class LoginScreen extends StatelessWidget {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-
+class LoginScreen extends StatefulWidget {
   LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final emailController = TextEditingController(text: 'gannaelami@gmail.com');
+  final passwordController = TextEditingController(text: '123456789');
+
+  bool showPassword = false;
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,15 +83,20 @@ class LoginScreen extends StatelessWidget {
                       const SizedBox(height: 8),
                       TextField(
                         controller: passwordController,
-                        obscureText: true,
+                        obscureText: !showPassword,
                         decoration: InputDecoration(
                           hintText: '**********',
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8)),
-                          suffixIcon: const Icon(Icons.visibility_off),
+                          suffixIcon: IconButton(
+                              onPressed: () {
+                                setState(() {
+                                  showPassword = !showPassword;
+                                });
+                              },
+                              icon: Icon(Icons.visibility_off)),
                         ),
                       ),
-                    
                       const SizedBox(height: 30),
                       SizedBox(
                         width: double.infinity,
@@ -89,7 +108,8 @@ class LoginScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(10)),
                           ),
                           onPressed: () {
-                            AuthCubit().get(context).signIn(
+            
+                            AuthCubit.get(context).signIn(
                                 email: emailController.text,
                                 password: passwordController.text);
                           },
@@ -100,7 +120,6 @@ class LoginScreen extends StatelessWidget {
                                       fontSize: 18, color: Colors.white)),
                         ),
                       ),
-                     
                       const SizedBox(height: 30),
                       Center(
                         child: RichText(

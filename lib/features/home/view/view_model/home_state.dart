@@ -24,3 +24,6 @@ class GetLimitBooksSucessState extends HomeStates {
 }
 
 class  GetLimitBooksErrorState extends HomeStates {}
+class AddProductLoading extends HomeStates{}
+class AddProductSuccess extends HomeStates{}
+class AddProductFailed extends HomeStates{}

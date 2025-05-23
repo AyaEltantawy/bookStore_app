@@ -1,196 +1,128 @@
+import 'package:bookstore_app/features/home/view/view_model/cubit/book_details_cubit.dart';
+import 'package:bookstore_app/features/home/view/view_model/cubit/book_details_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-class BookDetails extends StatefulWidget {
-  const BookDetails({super.key});
+class BookDetailsScreen extends StatelessWidget {
+  final int bookId;
 
-  @override
-  // ignore: library_private_types_in_public_api
-  _BookDetailsState createState() => _BookDetailsState();
-}
-
-class _BookDetailsState extends State<BookDetails> {
-  bool _isExpanded = false;
+  const BookDetailsScreen({super.key, required this.bookId});
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          leading: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(Icons.arrow_back),
-          ),
-        ),
-        backgroundColor: Colors.grey[200],
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
+    return BlocProvider(
+      create: (_) => BookDetailsCubit()..fetchBookDetails(bookId),
+      child: BlocBuilder<BookDetailsCubit, BookDetailsState>(
+        builder: (context, state) {
+          if (state is BookDetailsLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is BookDetailsSuccess) {
+            final book = state.book; // الوصول مباشرة إلى الكتاب
+
+            if (book == null) {
+              return Scaffold(
+                appBar: AppBar(title: const Text('Book Details')),
+                body: const Center(child: Text('No details available for this book')),
+              );
+            }
+
+          
+
+            return Scaffold(
+              appBar: AppBar(title: const Text('Book Details')),
+              body: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image.asset(
-                      'assets/image/ph1.png',
-                      height: 365,
-                      width: 254,
-                    ),
-                    SizedBox(width: 30),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 260),
-                      child: Image.asset(
-                        'assets/image/ph1.png',
-                        alignment: Alignment.bottomCenter,
-                        height: 102,
-                        width: 74,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        book.image??"",
+                        height: 250,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, __, ___) =>
+                            const Icon(Icons.broken_image),
                       ),
                     ),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Text(
-                  "Rich Dad And Poor Dad",
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 50),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _isExpanded
-                              ? 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et ultricies est. Aliquam in justo varius, sagittis neque ut, malesuada leo. Lorem ipsum dolor sit amet... consectetur adipiscing elit. Mauris et ultricies est. Aliquam in justo varius, sagittis neque ut, malesuada leo. Aliquam in justo varius, sagittis neque ut, malesuada leo.'
-                              : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et ultricies est. Aliquam in justo varius, sagittis neque ut, malesuada leo.',
-                          style: TextStyle(color: Colors.grey, fontSize: 14),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 80),
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              _isExpanded = !_isExpanded;
-                            });
-                          },
-                          child: Text(
-                            _isExpanded ? 'Read Less' : 'Read More',
-                            style: TextStyle(
-                                color: Colors.black87,
-                                fontWeight: FontWeight.bold),
-                          ),
-                       
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
+                    const SizedBox(height: 20),
+                    Text(
+                      book.title ?? 'No title available',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Author: ${book.author ?? 'Unknown'}',
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                    ),
+                    const SizedBox(height: 16),
                     Row(
                       children: [
-                        Icon(Icons.attach_money, color: Colors.black87),
+                        const Icon(Icons.attach_money, size: 18),
                         Text(
-                          '30.00',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        SizedBox(width: 5),
-                        Text(
-                          '50',
-                          style: TextStyle(
+                          book.priceAfterDiscount ?? book.price ?? '0',
+                          style: const TextStyle(
                             fontSize: 18,
-                            color: Colors.pinkAccent,
-                            decoration: TextDecoration.lineThrough,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(width: 190),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.white,
-                          ),
-                          padding: EdgeInsets.all(5),
-                          child: Row(
-                            children: [
-                              Icon(Icons.check_circle_outlined,
-                                  color: Colors.green, size: 20),
-                              Text(
-                                'In Stock',
-                                style: TextStyle(
-                                    color: Colors.green,
-                                    fontWeight: FontWeight.w500),
-                              )
-                            ],
-                          ),
+                        if (book.priceAfterDiscount != null) ...[
+                          const SizedBox(width: 8),
+                          Text(
+                            book.price ?? '0',
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.pink,
+                              decoration: TextDecoration.lineThrough,
+                            ),
+                          )
+                        ],
+                      ],
+                    ),
+                    const SizedBox(height: 30),
+                    const Text(
+                      'Description',
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      book.description ?? 'No description available',
+                      style: const TextStyle(
+                          fontSize: 14, color: Colors.black87),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.shopping_cart),
+                          onPressed: () {
+                            // TODO: Add to cart functionality
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.favorite_border),
+                          onPressed: () {
+                            // TODO: Add to wishlist functionality
+                          },
                         ),
                       ],
-                    )
+                    ),
                   ],
                 ),
-                SizedBox(
-                  height: 20,
-                ),
-                Row(
-                  children: [
-                    Text(
-                      'Book Details',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
-                    )
-                  ],
-                ),
-                Divider(
-                  color: Colors.grey,
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  children: [
-                    (Text(
-                      'Book Title :',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    )),
-                    Text(' Rich Dad And Poor Dad')
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  children: [
-                    (Text(
-                      'Author :',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    )),
-                    Text(' Robert T. Kiyosaki')
-                  ],
-                ),
-                SizedBox(
-                  height: 5,
-                ),
-                Row(
-                  children: [
-                    (Text(
-                      'ASIN:',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    )),
-                    Text(' B09TWSRMCB')
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
+              ),
+            );
+          } else if (state is BookDetailsError) {
+            return Scaffold(
+              appBar: AppBar(title: const Text('Book Details')),
+              body: Center(child: Text(state.message)),
+            );
+          }
+
+          return const SizedBox.shrink();
+        },
       ),
     );
   }

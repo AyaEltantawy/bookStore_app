@@ -1,55 +1,75 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:bookstore_app/features/home/data/models/book_model.dart';
+import 'package:bookstore_app/features/home/view/view_model/cubit/all_books_cubit.dart';
+import 'package:bookstore_app/features/home/view/view_model/cubit/all_books_state.dart';
 
 class AllBooksScreen extends StatelessWidget {
   const AllBooksScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppBar(
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back),
-        ),
-      ),
-      body: CustomScrollView(slivers: [
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    _buildBookCard(),
-                    SizedBox(width: 10),
-                    _buildBookCard(),
-                  ],
-                ),
-                SizedBox(height: 20),
-                Row(
-                  children: [
-                    _buildBookCard(),
-                    SizedBox(width: 10),
-                    _buildBookCard(),
-                  ],
-                ),
-              ],
-            ),
+    return BlocProvider(
+      create: (context) => AllBooksCubit()..fetchBooks(),
+      child: Scaffold(
+        backgroundColor: Colors.grey[200],
+        appBar: AppBar(
+          title: const Text("All Books"),
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () => Navigator.pop(context),
           ),
         ),
-      ]),
+        body: const AllBooksItem(),
+      ),
+    );
+  }
+}
+
+class AllBooksItem extends StatelessWidget {
+  const AllBooksItem({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+   
+    return BlocBuilder<AllBooksCubit, AllBooksState>(
+      builder: (context, state) {
+        if (state is AllBooksLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is AllBooksError) {
+          return Center(child: Text(state.message));
+        } else if (state is AllBooksSuccess) {
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: GridView.builder(
+              itemCount: state.books.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.65,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemBuilder: (context, index) {
+                 final String imageUrl = 'http://127.0.0.1:8000/upload/books/${'book.image'}';
+                final book = state.books[index];
+                return _buildBookCard(book);
+              },
+            ),
+          );
+        }
+
+        return const SizedBox();
+      },
     );
   }
 
-  Widget _buildBookCard() {
+  Widget _buildBookCard(BookModel book) {
     return Container(
-      height: 350,
-      width: 180,
-      color: Colors.white,
       padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -57,87 +77,54 @@ class AllBooksScreen extends StatelessWidget {
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.asset(
-                  'assets/image/ph1.png',
-                  height: 200,
+                child: Image.network(
+                 book.image,
+                  height: 160,
                   width: double.infinity,
                   fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => const Icon(Icons.broken_image),
                 ),
               ),
               Positioned(
                 top: 8,
                 left: 8,
                 child: Container(
-                  height: 30,
-                  width: 30,
+                  height: 28,
+                  width: 28,
                   decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.white.withOpacity(0.8),
+                    shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.favorite_border, size: 18),
+                  child: const Icon(Icons.favorite_border, size: 16),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 12),
-          const Text(
-            'Rich Dad And Poor Dad',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
+          const SizedBox(height: 10),
+          Text(
+            book.title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 6),
-          RichText(
-            text: const TextSpan(
-              children: [
-                TextSpan(
-                  text: 'Author: ',
-                  style: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 12,
-                  ),
-                ),
-                TextSpan(
-                  text: 'Robert T. Kiyosaki',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
+          const SizedBox(height: 4),
+          Text(
+            "Author: ${book.author}",
+            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
-          const SizedBox(height: 20),
+          const Spacer(),
           Row(
-            children: const [
-              Icon(Icons.attach_money, color: Colors.black87, size: 18),
+            children: [
+              const Icon(Icons.attach_money, size: 16, color: Colors.black),
               Text(
-                '30.00',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                  fontSize: 13,
-                ),
+                book.priceAfterDiscount ?? book.price,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
-              SizedBox(width: 6),
-              Text(
-                '50',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.pinkAccent,
-                  decoration: TextDecoration.lineThrough,
-                ),
-              ),
-              Spacer(),
-              Icon(
-                Icons.shopping_cart,
-                color: Colors.pinkAccent,
-                size: 20,
-              )
+              const Spacer(),
+              const Icon(Icons.shopping_cart_outlined,
+                  size: 18, color: Colors.pink),
             ],
           ),
         ],
