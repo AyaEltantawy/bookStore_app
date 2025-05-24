@@ -3,7 +3,7 @@ import 'package:bookstore_app/features/profile/view/view_model/profile_state.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class HelpPage extends StatelessWidget {
+class DeleteAccountPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -18,7 +18,7 @@ class HelpPage extends StatelessWidget {
             appBar: AppBar(
               backgroundColor: Colors.white,
               elevation: 0,
-              title: Text('Help', style: TextStyle(color: Colors.black)),
+              title: Text('Delete Account', style: TextStyle(color: Colors.black)),
               iconTheme: IconThemeData(color: Colors.black),
               leading: BackButton(),
             ),
@@ -28,56 +28,24 @@ class HelpPage extends StatelessWidget {
                 key: _formKey,
                 child: ListView(
                   children: [
-                    Text(
-                      'How can we help you?',
-                      style: TextStyle(color: Colors.grey, fontSize: 20),
-                    ),
-                    SizedBox(height: 10),
-                    Text(
-                      'If you have any questions or need assistance, please choose one of the options below.',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                    SizedBox(height: 30),
-                    _buildLabel('Enter your Name'),
+                    _buildLabel('Enter your Password'),
                     _buildInputField(
-                      controller: controller.nameController,
-                      validator: (value) =>
-                      value == null || value.trim().isEmpty ? 'Name is required' : null,
-                    ),
-                    _buildLabel('Enter your Email'),
-                    _buildInputField(
-                      controller: controller.emailController,
+                      controller: controller.passwordController,
                       validator: (value) {
-                        if (value == null || value.trim().isEmpty) return 'Email is required';
-                        final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-                        if (!emailRegex.hasMatch(value)) return 'Enter a valid email';
+                        if (value == null || value.trim().isEmpty) {
+                          return 'Password is required';
+                        } else if (value.length < 6) {
+                          return 'Password must be at least 6 characters';
+                        }
                         return null;
                       },
-                    ),
-                    _buildLabel('Enter your Subject'),
-                    _buildInputField(
-                      controller: controller.subjectController,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) return 'Subject is required';
-                        if (value.length > 50) return 'Subject must be less than 50 characters';
-                        return null;
-                      },
-                    ),
-                    _buildLabel('Enter your Content'),
-                    _buildInputField(
-                      controller: controller.contentController,
-                      maxLines: 5,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) return 'Content is required';
-                        if (value.length < 20) return 'Content must be at least 20 characters';
-                        return null;
-                      },
+                      obscureText: true,
                     ),
                     SizedBox(height: 30),
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          controller.help(context);
+                          controller.deleteAccount(context);
                         }
                       },
                       style: ElevatedButton.styleFrom(
@@ -87,7 +55,8 @@ class HelpPage extends StatelessWidget {
                         ),
                         padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                       ),
-                      child: Text('Send', style: TextStyle(fontSize: 16, color: Colors.white)),
+                      child: Text('Delete',
+                          style: TextStyle(fontSize: 16, color: Colors.white)),
                     )
                   ],
                 ),
@@ -110,11 +79,13 @@ class HelpPage extends StatelessWidget {
     required TextEditingController controller,
     String? Function(String?)? validator,
     int maxLines = 1,
+    bool obscureText = false,
   }) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
       validator: validator,
+      obscureText: obscureText,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,

@@ -1,8 +1,12 @@
+import 'package:bookstore_app/features/profile/view/presentation/delete_account.dart';
+import 'package:bookstore_app/features/profile/view/view_model/profile_cubit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../orders/view/presentation/order_history_screen.dart';
 import '../../change_password/change_password_view.dart';
 import '../../help_screen.dart';
+import '../view_model/profile_state.dart';
 import 'edit_profile_screen.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -39,6 +43,11 @@ class _ProfilePageState extends State<ProfilePage> {
       {'icon_color': Colors.pink, 'icon': Icons.delete, 'title': 'Delete Account'},
     ];
 
+    return BlocProvider(
+  create: (context) => ProfileCubit(),
+  child: BlocBuilder<ProfileCubit, ProfileState>(
+  builder: (context, state) {
+    final controller= BlocProvider.of<ProfileCubit>(context);
     return Scaffold(
       backgroundColor: const Color(0xF9F9F9F9),
       body: Column(
@@ -83,11 +92,21 @@ class _ProfilePageState extends State<ProfilePage> {
                 case 'Order History':
                   Navigator.push(context, MaterialPageRoute(builder: (_) => OrderHistoryPage()));
                   break;
+                case 'Log Out':
+                controller.logOut(context);
+                  break;
+                case 'Delete Account':
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => DeleteAccountPage()));
+                  break;
+
               }
             },
           )),
         ],
       ),
     );
+  },
+),
+);
   }
 }

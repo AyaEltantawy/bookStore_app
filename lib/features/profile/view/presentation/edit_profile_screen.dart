@@ -16,6 +16,8 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
   final ImagePicker _picker = ImagePicker();
   File? _pickedImage;
 
+  final _formKey = GlobalKey<FormState>();
+
   late TextEditingController nameController;
   late TextEditingController emailController;
   late TextEditingController phoneController;
@@ -85,68 +87,99 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
             ),
             body: SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
-              child: Column(
-                children: [
-                  Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 50,
-                        backgroundImage: _pickedImage != null
-                            ? FileImage(_pickedImage!)
-                            : (user['image'] != null
-                            ? NetworkImage(user['image'])
-                            : const AssetImage('assets/image/profile.jpg')) as ImageProvider,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: GestureDetector(
-                          onTap: _pickImage,
-                          child: Container(
-                            decoration: const BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.pink,
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 50,
+                          backgroundImage: _pickedImage != null
+                              ? FileImage(_pickedImage!)
+                              : (user['image'] != null
+                              ? NetworkImage(user['image'])
+                              : const AssetImage('assets/image/profile.jpg')) as ImageProvider,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: GestureDetector(
+                            onTap: _pickImage,
+                            child: Container(
+                              decoration: const BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.pink,
+                              ),
+                              padding: const EdgeInsets.all(6),
+                              child: const Icon(Icons.add, color: Colors.white, size: 20),
                             ),
-                            padding: const EdgeInsets.all(6),
-                            child: const Icon(Icons.add, color: Colors.white, size: 20),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 30),
-                  _buildLabel('Name'),
-                  _buildInputField(controller: nameController),
-                  _buildLabel('Email'),
-                  _buildInputField(controller: emailController),
-                  _buildLabel('Phone Number'),
-                  _buildInputField(controller: phoneController),
-                  _buildLabel('City'),
-                  _buildInputField(controller: cityController),
-                  _buildLabel('Address'),
-                  _buildInputField(controller: addressController),
-                  const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: () {
-                      final updatedData = {
-                        'name': nameController.text.trim(),
-                        'email': emailController.text.trim(),
-                        'phone': phoneController.text.trim(),
-                        'city': cityController.text.trim(),
-                        'address': addressController.text.trim(),
-                        "image":_pickedImage
-                      };
-
-                      context.read<ProfileCubit>().updateProfile(updatedData);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.pink,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      ],
                     ),
-                    child: const Text('Save', style: TextStyle(fontSize: 16, color: Colors.white)),
-                  ),
-                ],
+                    const SizedBox(height: 30),
+                    _buildLabel('Name'),
+                    _buildInputField(
+                      controller: nameController,
+                      validator: (value) =>
+                      value == null || value.isEmpty ? 'Please enter your name' : null,
+                    ),
+                    _buildLabel('Email'),
+                    _buildInputField(
+                      controller: emailController,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) return 'Please enter your email';
+                        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                        if (!emailRegex.hasMatch(value)) return 'Enter a valid email';
+                        return null;
+                      },
+                    ),
+                    _buildLabel('Phone Number'),
+                    _buildInputField(
+                      controller: phoneController,
+                      keyboardType: TextInputType.phone,
+                      validator: (value) =>
+                      value == null || value.isEmpty ? 'Please enter your phone number' : null,
+                    ),
+                    _buildLabel('City'),
+                    _buildInputField(
+                      controller: cityController,
+                      validator: (value) =>
+                      value == null || value.isEmpty ? 'Please enter your city' : null,
+                    ),
+                    _buildLabel('Address'),
+                    _buildInputField(
+                      controller: addressController,
+                      validator: (value) =>
+                      value == null || value.isEmpty ? 'Please enter your address' : null,
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          final updatedData = {
+                            'name': nameController.text.trim(),
+                            'email': emailController.text.trim(),
+                            'phone': phoneController.text.trim(),
+                            'city': cityController.text.trim(),
+                            'address': addressController.text.trim(),
+                            "image": _pickedImage,
+                          };
+
+                          context.read<ProfileCubit>().updateProfile(updatedData);
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.pink,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                      ),
+                      child: const Text('Save', style: TextStyle(fontSize: 16, color: Colors.white)),
+                    ),
+                  ],
+                ),
               ),
             ),
           );
@@ -165,9 +198,15 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
     );
   }
 
-  Widget _buildInputField({required TextEditingController controller}) {
-    return TextField(
+  Widget _buildInputField({
+    required TextEditingController controller,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    return TextFormField(
       controller: controller,
+      keyboardType: keyboardType,
+      validator: validator,
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,

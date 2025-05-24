@@ -2,9 +2,14 @@ import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:bookstore_app/core/services/dio_helper.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../core/magic_router/magic_router.dart';
+import '../../../../core/utils/snack_bar.dart';
+import '../../../auth/views/presentation/create_account_screen.dart';
+import '../../../auth/views/presentation/login_screen.dart';
 import 'profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
@@ -71,4 +76,162 @@ class ProfileCubit extends Cubit<ProfileState> {
       emit(ProfileErrorState(error: {'general': ['Update failed. Try again.']}));
     }
   }
+  TextEditingController nameController=TextEditingController();
+  TextEditingController  emailController = TextEditingController();
+  TextEditingController  subjectController = TextEditingController();
+  TextEditingController  contentController = TextEditingController();
+  TextEditingController  passwordController = TextEditingController();
+
+  Future<void> help(BuildContext context) async {
+    final data = {
+      'name': nameController.text.trim(),
+      'email':emailController.text.trim(),
+      'subject':subjectController.text.trim(),
+      'content':contentController.text.trim()
+    };
+
+    print('Request Body: $data');
+    emit(LoadingHelp());
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        emit(LoadingError());
+        Utils.showSnackBar(context, 'No token found. Please log in again.');
+        return;
+      }
+
+      final response = await DioHelper.postData(
+        url: "/send-message",
+        data: data,
+        token: token,
+      );
+
+      final responseData = response.data as Map<String, dynamic>;
+      print("Response Data: $responseData");
+
+      if (responseData['status'] == true) {
+        emit(LoadingSuccess());
+        Utils.showSnackBar(context, responseData["message"]);
+
+      } else {
+        emit(LoadingError());
+        Utils.showSnackBar(
+          context,
+          responseData['message'] ?? "An error occurred.",
+        );
+      }
+    } catch (e) {
+      emit(LoadingError());
+      Utils.showSnackBar(
+        context,
+        "Something went wrong. Please try again.",
+      );
+      print("❌ Error: $e");
+    }
+  }
+  Future<void> logOut(BuildContext context) async {
+    emit(LoadingLogOut());
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        emit(LoadingError());
+        Utils.showSnackBar(context, 'No token found. Please log in again.');
+        return;
+      }
+
+      final response = await DioHelper.postData(
+        url: "/logout",
+        token: token,
+
+      );
+
+      final responseData = response.data as Map<String, dynamic>;
+      print("✅ Logout Response Data: $responseData");
+
+      if (responseData['status'] == 200) {
+
+        emit(LoadingSuccess());
+        Utils.showSnackBar(context, responseData["message"]);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => LoginScreen()),
+        );
+      } else {
+        emit(LoadingError());
+        Utils.showSnackBar(
+          context,
+          responseData['message'] ?? "An error occurred.",
+        );
+      }
+    } on DioException catch (dioError) {
+      emit(LoadingError());
+      print("❌ Dio Error: ${dioError.response?.data ?? dioError.message}");
+      Utils.showSnackBar(
+        context,
+        "Network error. Please try again.",
+      );
+    } catch (e) {
+      emit(LoadingError());
+      print("❌ Unexpected Error: $e");
+      Utils.showSnackBar(
+        context,
+        "Something went wrong. Please try again.",
+      );
+    }
+  }
+  Future<void> deleteAccount(BuildContext context) async {
+    final data = {
+      'password':passwordController.text.trim()
+    };
+
+    print('Request Body: $data');
+    emit(DeleteAccountLoading());
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+
+      if (token == null) {
+        emit(LoadingError());
+        Utils.showSnackBar(context, 'No token found. Please log in again.');
+        return;
+      }
+
+      final response = await DioHelper.postData(
+        url: "/delete-profile",
+        data: data,
+        token: token,
+      );
+
+      final responseData = response.data as Map<String, dynamic>;
+      print("Response Data: $responseData");
+
+      if (responseData['status'] == true) {
+        emit(DeleteAccountSuccess());
+        Utils.showSnackBar(context, responseData["message"]);
+        Navigator.push(context, MaterialPageRoute(builder: (_) => CreateAccountPage()));
+      } else {
+        emit(DeleteAccountError());
+        Utils.showSnackBar(
+          context,
+          responseData['message'] ?? "An error occurred.",
+        );
+      }
+    } catch (e) {
+      emit( DeleteAccountError());
+      Utils.showSnackBar(
+        context,
+        "Something went wrong. Please try again.",
+      );
+      print("❌ Error: $e");
+    }
+  }
+  
 }

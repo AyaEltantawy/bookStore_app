@@ -49,7 +49,7 @@ class DioHelper {
 
   static Future<Response> postData({
     required String url,
-    required dynamic data, // <-- Now dynamic to support FormData
+     dynamic data, // <-- Now dynamic to support FormData
     String? token,
     bool isFormData = false, // <-- New flag
   }) async {
