@@ -1,7 +1,9 @@
 import 'package:bookstore_app/core/magic_router/magic_router.dart';
 import 'package:bookstore_app/core/utils/snack_bar.dart';
 import 'package:bookstore_app/features/cart/data/model/cart_model.dart';
+import 'package:bookstore_app/features/orders/view/presentation/order_history_screen.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../core/services/dio_helper.dart';
@@ -53,8 +55,12 @@ class CheckoutCubit extends Cubit<CheckoutState> {
 
       final data = response?.data;
       if (data != null && data['status'] == true) {
+
         Utils.showSnackBar(context, data['message']);
+
         emit(CheckoutSuccessState(data['message']));
+
+
       } else {
         emit(CheckoutErrorState(data?['message'] ?? 'Order failed'));
       }

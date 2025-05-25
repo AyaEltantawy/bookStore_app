@@ -27,3 +27,6 @@ class OrderState {
     );
   }
 }
+class LoadingAddReview extends OrderState{}
+class LoadingAddReviewError extends OrderState{}
+class LoadingAddReviewSuccess extends OrderState{}

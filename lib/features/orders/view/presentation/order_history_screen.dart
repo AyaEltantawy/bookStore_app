@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../order/order_details.dart';
 import '../view_model/order_cubit.dart';
 import '../view_model/order_state.dart';
 import '../widget/order_card.dart';
@@ -74,11 +75,23 @@ class _OrderHistoryView extends StatelessWidget {
                   print("orddddddddders${state.orders.length}");
                   return ListView.builder(
                     itemCount: state.orders.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     itemBuilder: (context, index) {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12.0),
-                        child: OrderCard(order: state.orders[index]),
+                        child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => OrderDetailsScreen(
+                                    orderId: state.orders[index].orderId ?? 1,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: OrderCard(order: state.orders[index])),
                       );
                     },
                   );

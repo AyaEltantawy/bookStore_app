@@ -9,6 +9,8 @@ import 'package:bookstore_app/features/checkout/view/view_models/checkout_state.
 import 'package:bookstore_app/features/cart/view/widget/cart_summary_widget.dart';
 import 'package:bookstore_app/features/checkout/view/widget/payment_option_widget.dart';
 
+import '../../../orders/view/presentation/order_history_screen.dart';
+
 
 class CheckoutScreen extends StatelessWidget {
   const CheckoutScreen({super.key});
@@ -94,7 +96,10 @@ class CheckoutScreen extends StatelessWidget {
                       ),
                       onPressed: () {
                         context.read<CheckoutCubit>().placeOrder(context);
-
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => OrderHistoryPage()),
+                        );
                       },
                       child: const Text("Confirm order"),
                     ),

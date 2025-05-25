@@ -5,7 +5,6 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../../core/magic_router/magic_router.dart';
 import '../../../../core/utils/snack_bar.dart';
 import '../../../auth/views/presentation/create_account_screen.dart';
@@ -67,7 +66,7 @@ class ProfileCubit extends Cubit<ProfileState> {
       );
 
       if (response.data["status"] == 200) {
-        await getProfile(); // Also updates prefs
+        await getProfile();
         emit(UpdateProfileSuccess());
       } else {
         emit(ProfileErrorState(error: {'general': [response.data["message"] ?? 'Update failed.']}));

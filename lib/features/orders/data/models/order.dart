@@ -5,8 +5,10 @@ class Order {
   final String status;
   final String date;
   final String paymentMethod;
+  final int? orderId;
+  final int? reviewId;
 
-  Order({
+  Order({this.reviewId, this.orderId,
     required this.totalAmount,
     required this.status,
     required this.date,

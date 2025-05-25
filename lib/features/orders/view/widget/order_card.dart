@@ -19,8 +19,11 @@ class OrderCard extends StatelessWidget {
             Text("Status: ${order.status}"),
             Text("Date: ${order.date}"),
             Text("Payment: ${order.paymentMethod}"),
+            Text(order.reviewId != null ? "Already Reviewed" : "Not Reviewed")
+
           ],
         ),
+
       ),
     );
   }
