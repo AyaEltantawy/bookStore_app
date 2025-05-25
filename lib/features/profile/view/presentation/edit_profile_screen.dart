@@ -1,3 +1,4 @@
+// edit_profile_screen.dart
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -59,6 +60,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Profile updated successfully')),
             );
+            Navigator.pop(context);
           } else if (state is ProfileErrorState) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -97,9 +99,9 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                           radius: 50,
                           backgroundImage: _pickedImage != null
                               ? FileImage(_pickedImage!)
-                              : (user['image'] != null
-                              ? NetworkImage(user['image'])
-                              : const AssetImage('assets/image/profile.jpg')) as ImageProvider,
+                              : (user['image'] != null && user['image'].toString().isNotEmpty)
+                              ? NetworkImage(user['image']) as ImageProvider
+                              : const AssetImage('assets/image/profile.jpg'),
                         ),
                         Positioned(
                           bottom: 0,
@@ -120,41 +122,19 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                     ),
                     const SizedBox(height: 30),
                     _buildLabel('Name'),
-                    _buildInputField(
-                      controller: nameController,
-                      validator: (value) =>
-                      value == null || value.isEmpty ? 'Please enter your name' : null,
-                    ),
+                    _buildInputField(controller: nameController, validator: _required),
                     _buildLabel('Email'),
                     _buildInputField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) return 'Please enter your email';
-                        final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                        if (!emailRegex.hasMatch(value)) return 'Enter a valid email';
-                        return null;
-                      },
+                      validator: _validateEmail,
                     ),
                     _buildLabel('Phone Number'),
-                    _buildInputField(
-                      controller: phoneController,
-                      keyboardType: TextInputType.phone,
-                      validator: (value) =>
-                      value == null || value.isEmpty ? 'Please enter your phone number' : null,
-                    ),
+                    _buildInputField(controller: phoneController, keyboardType: TextInputType.phone, validator: _required),
                     _buildLabel('City'),
-                    _buildInputField(
-                      controller: cityController,
-                      validator: (value) =>
-                      value == null || value.isEmpty ? 'Please enter your city' : null,
-                    ),
+                    _buildInputField(controller: cityController, validator: _required),
                     _buildLabel('Address'),
-                    _buildInputField(
-                      controller: addressController,
-                      validator: (value) =>
-                      value == null || value.isEmpty ? 'Please enter your address' : null,
-                    ),
+                    _buildInputField(controller: addressController, validator: _required),
                     const SizedBox(height: 30),
                     ElevatedButton(
                       onPressed: () {
@@ -186,6 +166,15 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
         },
       ),
     );
+  }
+
+  String? _required(String? value) => value == null || value.isEmpty ? 'This field is required' : null;
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) return 'Please enter your email';
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value)) return 'Enter a valid email';
+    return null;
   }
 
   Widget _buildLabel(String label) {

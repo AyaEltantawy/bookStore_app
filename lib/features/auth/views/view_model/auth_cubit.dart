@@ -74,24 +74,25 @@ class AuthCubit extends Cubit<AuthStates> {
 
       final message = response.data['message'] ?? 'Registration successful';
       final data = response.data['data'] as Map<String, dynamic>?;
+
       if (data == null) throw Exception("No user data returned");
 
-      final token = data['token'];
-      final user = data['user'];
+      final token = data['token'] as String?;
+      final user = data['user'] as Map<String, dynamic>?;
 
-      if (token != '') {
+      if (token != null && token.isNotEmpty && user != null) {
+        // Save token and user info to cache/shared preferences
         await CacheHelper.saveData(key: 'token', value: token);
 
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setInt('token' ,token);
+        await prefs.setString('token', token);
         await prefs.setInt('user_id', user['id']);
         await prefs.setString('user_name', user['name']);
         await prefs.setString('user_email', user['email']);
-        await prefs.setString('user_image', user['image']);
+        await prefs.setString('user_image', user['image'] ?? '');
 
         emit(SignUpSuccessState(message: message));
         MagicRouter.navigateTo(const HomeScreen());
-
       } else {
         emit(SignUpErrorState(error: {
           'general': ['Invalid token or user data received']
@@ -103,5 +104,4 @@ class AuthCubit extends Cubit<AuthStates> {
         'general': ['Failed to register, please try again.']
       }));
     }
-  }
-}
+  }}

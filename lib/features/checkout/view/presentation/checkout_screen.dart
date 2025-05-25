@@ -70,9 +70,9 @@ class CheckoutScreen extends StatelessWidget {
                     children: [
                       const Text("Payment Method", style: TextStyle(fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
-                      PaymentOption(title: "Online payment"),
+
                       PaymentOption(title: "Cash on delivery", selected: true),
-                      PaymentOption(title: "POS on delivery"),
+
                     ],
                   ),
                   const SizedBox(height: 16),

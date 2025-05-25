@@ -60,33 +60,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       SizedBox(height: 16),
                       _buildPasswordField('Confirm password', false),
                       SizedBox(height: 16),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: _agreeToTerms,
-                            onChanged: (value) {
-                              setState(() {
-                                _agreeToTerms = value!;
-                              });
-                            },
-                          ),
-                          Expanded(
-                            child: RichText(
-                              text: TextSpan(
-                                text: 'Agree with ',
-                                style: TextStyle(color: Colors.black),
-                                children: [
-                                  TextSpan(
-                                    text: 'Terms & Conditions',
-                                    style: TextStyle(color: Colors.pink),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 16),
+
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
@@ -98,28 +72,22 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
                           onPressed: () {
-                            if (_formKey.currentState!.validate() &&
-                                _agreeToTerms) {
+
                               // نداء الـ SignUp
                               context.read<AuthCubit>().signUp(
                                     name: _nameController.text.toString(),
                                     email: _emailController.text.toString(),
-                                password_confirmation:
-                                _confirmPasswordController.text.toString(),
-                                    password: _passwordController.text.toString(),
-
+                                    password_confirmation:
+                                        _confirmPasswordController.text
+                                            .toString(),
+                                    password:
+                                        _passwordController.text.toString(),
                                   );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('اكتب جميع البيانات اولا'),
-                                  backgroundColor: Colors.red,
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
+
+
                             }
-                          },
-                          child: state is SignUpLoadingState
+
+                          ,child: state is SignUpLoadingState
                               ? const CircularProgressIndicator()
                               : const Text(
                                   'Create account',
@@ -135,7 +103,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               ),
             );
           }, listener: (context, state) {
-
             if (state is SignUpErrorState) {
               final allErrors = state.error.entries
                   .map((entry) => '${entry.key}: ${entry.value.join(', ')}')
@@ -152,7 +119,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
               ));
 
               Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const NavigationBarScreen()));
+                  builder: (context) => const NavigationBarScreen()));
             }
           })),
     );

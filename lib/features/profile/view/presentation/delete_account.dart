@@ -3,6 +3,8 @@ import 'package:bookstore_app/features/profile/view/view_model/profile_state.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../auth/views/presentation/create_account_screen.dart';
+
 class DeleteAccountPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
@@ -18,7 +20,8 @@ class DeleteAccountPage extends StatelessWidget {
             appBar: AppBar(
               backgroundColor: Colors.white,
               elevation: 0,
-              title: Text('Delete Account', style: TextStyle(color: Colors.black)),
+              title:
+                  Text('Delete Account', style: TextStyle(color: Colors.black)),
               iconTheme: IconThemeData(color: Colors.black),
               leading: BackButton(),
             ),
@@ -47,13 +50,19 @@ class DeleteAccountPage extends StatelessWidget {
                         if (_formKey.currentState!.validate()) {
                           controller.deleteAccount(context);
                         }
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => CreateAccountPage()),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.pink,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 40, vertical: 15),
                       ),
                       child: Text('Delete',
                           style: TextStyle(fontSize: 16, color: Colors.white)),

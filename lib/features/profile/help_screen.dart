@@ -77,7 +77,7 @@ class HelpPage extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          controller.help(context);
+                          controller.sendHelpRequest(context);
                         }
                       },
                       style: ElevatedButton.styleFrom(
