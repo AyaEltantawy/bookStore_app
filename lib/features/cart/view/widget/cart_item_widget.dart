@@ -44,7 +44,7 @@ class CartItemWidget extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${book.priceAfterDiscount} EGP',
+                    '${book.price} EGP',
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.w500),
                   ),
@@ -78,7 +78,11 @@ class CartItemWidget extends StatelessWidget {
                   onPressed: () {
                     cartCubit.updateQuantity(book.id, book.quantity + 1);
                   },
-                ),
+                )
+                ,
+
+                InkWell(onTap: (){cartCubit.deleteCartProduct(context,book.id);},
+                    child: Icon(Icons.delete,color: Colors.red,))
               ],
             ),
           ],

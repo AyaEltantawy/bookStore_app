@@ -12,7 +12,7 @@ class CategoryCubit extends Cubit<CategoryState> {
     try {
       emit(CategoryLoading());
 
-      final response = await DioHelper.getData(url: 'categories', query: {}); // ← عدل الرابط حسب API
+      final response = await DioHelper.getData(url: '/categories', query: {}); // ← عدل الرابط حسب API
 
       final categoryModel = CategoryModel.fromJson(response.data);
 

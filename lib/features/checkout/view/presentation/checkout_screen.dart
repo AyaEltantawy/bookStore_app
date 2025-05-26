@@ -1,16 +1,12 @@
 import 'package:bookstore_app/core/magic_router/magic_router.dart';
-
 import 'package:bookstore_app/features/checkout/view/widget/checkout_cart_item_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:bookstore_app/features/checkout/view/view_models/checkout_cubit.dart';
 import 'package:bookstore_app/features/checkout/view/view_models/checkout_state.dart';
 import 'package:bookstore_app/features/cart/view/widget/cart_summary_widget.dart';
 import 'package:bookstore_app/features/checkout/view/widget/payment_option_widget.dart';
-
 import '../../../orders/view/presentation/order_history_screen.dart';
-
 
 class CheckoutScreen extends StatelessWidget {
   const CheckoutScreen({super.key});
@@ -44,22 +40,14 @@ class CheckoutScreen extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-
-                  // Expanded(
-                  //   child: ListView.separated(
-                  //     itemCount: cart.cartBooks.length,
-                  //     separatorBuilder: (_, __) => const Divider(),
-                  //     itemBuilder: (context, index) =>
-                  //         CartItemWidget(book: cart.cartBooks[index]),
-                  //   ),
-                  // ),
                   SizedBox(
-                    height: 300, // Or dynamically based on screen height
+                    height: 300,
                     child: ListView.separated(
                       itemCount: cart.cartBooks.length,
                       separatorBuilder: (_, __) => const Divider(),
-                      itemBuilder: (context, index) =>
-                          CheckoutCartItemWidget(book: cart.cartBooks[index]),
+                      itemBuilder: (context, index) => CheckoutCartItemWidget(
+                        book: cart.cartBooks[index],
+                      ),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -67,12 +55,10 @@ class CheckoutScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Payment Method", style: TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-
+                    children: const [
+                      Text("Payment Method", style: TextStyle(fontWeight: FontWeight.bold)),
+                      SizedBox(height: 8),
                       PaymentOption(title: "Cash on delivery", selected: true),
-
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -98,7 +84,9 @@ class CheckoutScreen extends StatelessWidget {
                         context.read<CheckoutCubit>().placeOrder(context);
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => OrderHistoryPage()),
+                          MaterialPageRoute(
+                            builder: (context) => const OrderHistoryPage(),
+                          ),
                         );
                       },
                       child: const Text("Confirm order"),
@@ -108,8 +96,6 @@ class CheckoutScreen extends StatelessWidget {
               ),
             );
           }
-
-          // في حالة مفيش حاجة من الحالات التانية
           return const Center(child: Text('No data available'));
         },
       ),

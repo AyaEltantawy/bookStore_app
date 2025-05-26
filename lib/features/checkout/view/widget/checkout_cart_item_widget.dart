@@ -34,7 +34,7 @@ class CheckoutCartItemWidget extends StatelessWidget {
                       style: const TextStyle(
                           fontWeight: FontWeight.bold, fontSize: 16)),
                   const SizedBox(height: 4),
-                  Text('${book.priceAfterDiscount} EGP',
+                  Text('${book.price} EGP',
                       style: const TextStyle(
                           fontSize: 16, fontWeight: FontWeight.w500)),
                   Text('Quantity: ${book.quantity}',

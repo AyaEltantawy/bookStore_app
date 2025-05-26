@@ -46,8 +46,17 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   // Update profile info including image (if File is passed)
-  Future<void> updateProfile(Map<String, dynamic> data) async {
+  Future<void> updateProfile(BuildContext context, Map<String, dynamic> data) async {
+    // Check if image is missing or invalid
+    if (data['image'] == null || data['image'] is! File) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please pick a profile image')),
+      );
+      return;
+    }
+
     emit(ProfileLoadingState());
+
     try {
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
@@ -59,7 +68,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         if (entry.key == 'image' && entry.value is File) {
           formData.files.add(MapEntry(
             'image',
-            await MultipartFile.fromFile(entry.value.path, filename: 'assets/image/profile.jpg'),
+            await MultipartFile.fromFile(entry.value.path, filename: 'profile.jpg'),
           ));
         } else {
           formData.fields.add(MapEntry(entry.key, entry.value.toString()));
@@ -74,17 +83,20 @@ class ProfileCubit extends Cubit<ProfileState> {
       );
 
       if (response.data["status"] == 200) {
-        // Reload profile to get updated data and image URL saved to prefs
-        await getProfile();
+        await getProfile(); // Refresh updated data
         emit(UpdateProfileSuccess());
       } else {
-        emit(ProfileErrorState(
-            error: {'general': [response.data["message"] ?? 'Update failed.']}));
+        emit(ProfileErrorState(error: {
+          'general': [response.data["message"] ?? 'Update failed.']
+        }));
       }
     } catch (e) {
-      emit(ProfileErrorState(error: {'general': ['Update failed: ${e.toString()}']}));
+      emit(ProfileErrorState(error: {
+        'general': ['Update failed: ${e.toString()}']
+      }));
     }
   }
+
 
   // Controllers for help form
   final TextEditingController nameController = TextEditingController();

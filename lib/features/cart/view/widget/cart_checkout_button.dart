@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:bookstore_app/features/checkout/view/presentation/checkout_screen.dart';
-
 import '../../../checkout/view/view_models/checkout_cubit.dart';
 
 class CartCheckoutButton extends StatelessWidget {
@@ -9,9 +8,9 @@ class CartCheckoutButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BottomAppBar(
+    return SafeArea(
       child: SizedBox(
-        height: 120,
+        height: 80,
         child: Row(
           children: [
             Expanded(
@@ -31,12 +30,19 @@ class CartCheckoutButton extends StatelessWidget {
                   },
                   icon: const Icon(Icons.arrow_forward, color: Colors.white),
                   label: const Text(
-                      'CHECK OUT',
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)
+                    'CHECK OUT',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.pink,
                     padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ),

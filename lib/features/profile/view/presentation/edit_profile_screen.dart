@@ -148,7 +148,7 @@ class _PersonalDataPageState extends State<PersonalDataPage> {
                             "image": _pickedImage,
                           };
 
-                          context.read<ProfileCubit>().updateProfile(updatedData);
+                          context.read<ProfileCubit>().updateProfile(context,updatedData);
                         }
                       },
                       style: ElevatedButton.styleFrom(
