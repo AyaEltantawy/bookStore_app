@@ -50,7 +50,8 @@ class AllBooksItem extends StatelessWidget {
                 mainAxisSpacing: 8,
               ),
               itemBuilder: (context, index) {
-                 final String imageUrl = 'https://project.ahdafweb.com/upload/books/${'book.image'}';
+                 final String imageUrl = "http://10.0.2.2:8000/upload/books/1746038310_4658774_81h8oAttukL.SY466.jpg";
+                 ;
                 final book = state.books[index];
                 return _buildBookCard(book);
               },
