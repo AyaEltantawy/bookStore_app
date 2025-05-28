@@ -4,7 +4,7 @@ import '../view_model/cart_cubit.dart';
 import '../view_model/cart_state.dart';
 import '../widget/cart_checkout_button.dart';
 import '../widget/cart_item_widget.dart';
-import '../widget/cart_summary_widget.dart';
+// import '../widget/cart_summary_widget.dart'; // Uncomment if you want to use this
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -32,6 +32,14 @@ class _CartScreenState extends State<CartScreen> {
             return const Center(child: CircularProgressIndicator());
           } else if (state is CartLoadedState) {
             final cart = state.cart;
+            if (cart.cartBooks.isEmpty) {
+              return const Center(
+                child: Text(
+                  'No items in cart ,add to continue',
+                  style: TextStyle(fontSize: 18),
+                ),
+              );
+            }
             return Column(
               children: [
                 Expanded(
@@ -42,9 +50,10 @@ class _CartScreenState extends State<CartScreen> {
                         CartItemWidget(book: cart.cartBooks[index]),
                   ),
                 ),
+                // Uncomment the following line if you want to show the summary
                 // CartSummaryWidget(total: cart.total),
 
-                CartCheckoutButton()
+                CartCheckoutButton(),
               ],
             );
           } else if (state is CartErrorState) {
